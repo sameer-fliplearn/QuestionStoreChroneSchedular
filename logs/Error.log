@@ -1,0 +1,13 @@
+2017-05-19 15:40:41.913  INFO 15308 --- [main] c.f.cronShedular.CronJobApplication      : Starting CronJobApplication on sameer-ubuntu with PID 15308 (/home/sameer/AllWS/gitRepoWorkspace1/CronSchedualrQuestionBank/target/classes started by sameer in /home/sameer/AllWS/gitRepoWorkspace1/CronSchedualrQuestionBank)
+2017-05-19 15:40:41.917  INFO 15308 --- [main] c.f.cronShedular.CronJobApplication      : No active profile set, falling back to default profiles: default
+2017-05-19 15:40:41.983  INFO 15308 --- [main] ationConfigEmbeddedWebApplicationContext : Refreshing org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext@4397ad89: startup date [Fri May 19 15:40:41 IST 2017]; root of context hierarchy
+2017-05-19 15:40:44.656  INFO 15308 --- [main] s.b.c.e.t.TomcatEmbeddedServletContainer : Tomcat initialized with port(s): 8888 (http)
+2017-05-19 15:40:44.676  INFO 15308 --- [main] o.apache.catalina.core.StandardService   : Starting service Tomcat
+2017-05-19 15:40:44.678  INFO 15308 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet Engine: Apache Tomcat/8.5.14
+2017-05-19 15:40:44.927  INFO 15308 --- [localhost-startStop-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2017-05-19 15:40:44.927  INFO 15308 --- [localhost-startStop-1] o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 2948 ms
+2017-05-19 15:40:45.195  INFO 15308 --- [localhost-startStop-1] o.s.b.w.servlet.ServletRegistrationBean  : Mapping servlet: 'dispatcherServlet' to [/]
+2017-05-19 15:40:45.201  INFO 15308 --- [localhost-startStop-1] o.s.b.w.servlet.FilterRegistrationBean   : Mapping filter: 'characterEncodingFilter' to: [/*]
+2017-05-19 15:40:45.202  INFO 15308 --- [localhost-startStop-1] o.s.b.w.servlet.FilterRegistrationBean   : Mapping filter: 'hiddenHttpMethodFilter' to: [/*]
+2017-05-19 15:40:45.203  INFO 15308 --- [localhost-startStop-1] o.s.b.w.servlet.FilterRegistrationBean   : Mapping filter: 'httpPutFormContentFilter' to: [/*]
+2017-05-19 15:40:45.203  INFO 15308 --- [localhost-startStop-1] o.s.b.w.servlet.FilterRegistrationBean   : Mapping filter: 'requestContextFilter' to: [/*]
