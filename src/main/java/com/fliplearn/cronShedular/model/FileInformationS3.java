@@ -16,7 +16,16 @@ public class FileInformationS3 {
 	private String fileName;
 	private String fileUrl;
 	private Boolean fileStatus;
+	private Integer assignedCron;
 	
+	public Integer getAssignedCron() {
+		return assignedCron;
+	}
+
+	public void setAssignedCron(Integer assignedCron) {
+		this.assignedCron = assignedCron;
+	}
+
 	public FileInformationS3() {
 		// TODO Auto-generated constructor stub
 	}

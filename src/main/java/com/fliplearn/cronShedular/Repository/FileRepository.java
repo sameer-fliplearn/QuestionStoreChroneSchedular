@@ -12,7 +12,7 @@ import com.fliplearn.cronShedular.model.FileInformationS3;
 public interface FileRepository extends CrudRepository<FileInformationS3,Integer>  {
 
 
-public FileInformationS3 findTop1ByFileStatus(@Param("fileStatus")Boolean fileStatus);
+public FileInformationS3 findTop1ByFileStatusAndAssignedCron(@Param("fileStatus")Boolean fileStatus,@Param("assignedCron")Integer assignedCron);
 
 @Transactional
 @Modifying
