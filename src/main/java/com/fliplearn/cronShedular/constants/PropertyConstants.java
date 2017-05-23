@@ -7,7 +7,7 @@ public static final String SUBJECTID = "subjectId";
 public static final String CHAPTERID = "chapterId";
 public static final String QUESTIONCODE = "questionCode";
 public static final String ID = "id";
-public static final String propertyFileLocation="/opt/properties/cronJobProperties.properties";
+public static final String propertyFileLocation="/cronJobProperties.properties";
 public static final String QUESTIONTYPE="questionType";
 public static final String ENDINDEX ="endIndex";
 public static final String STARTINDEX="startIndex";   
@@ -22,6 +22,7 @@ public static final String s3DocCopyLocation="/home/sameer/Downloads/s3Downloade
 public static final String extensionDocx =".docx";
 public static final String extensionDoc =".doc";
 public static final String extensionOdt = ".odt";
+public static final String BASEURL="Base_URL";
 //public static final Object TOPICID = topicId;
 
 }

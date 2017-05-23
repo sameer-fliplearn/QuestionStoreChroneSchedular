@@ -8,7 +8,6 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -28,13 +27,10 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.amazonaws.AmazonClientException;
-
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
@@ -52,14 +48,15 @@ import com.fliplearn.cronShedular.exception.RetryFailureException;
 import com.fliplearn.cronShedular.model.FileInformationS3;
 
 @Component
-@PropertySource("classpath:config.properties")
+/* @PropertySource("classpath:config.properties") */
 public class ConnectorHttp {
 
 	@Autowired
 	private FileRepository filerepo;
 
-	@Value("${Base_URL}")
-	private String baseUrl;
+	/*
+	 * @Value("${Base_URL}") private String baseUrl;
+	 */
 
 	private static final Logger logger = LoggerFactory.getLogger(ConnectorHttp.class);
 	private static int count = 0;
@@ -67,12 +64,21 @@ public class ConnectorHttp {
 	private static AmazonS3 s3client;
 	static int countretry = 0;
 
+	/*
+	 * static { pathh =
+	 * ClassLoader.getSystemClassLoader().getResource(".").getPath(); pathh =
+	 * pathh.substring(0, pathh.length() - 1); System.out.println(pathh); int
+	 * index = pathh.lastIndexOf('/'); pathh = pathh.substring(0, index);
+	 * System.out.println(pathh); }
+	 */
 	@Scheduled(fixedRate = 5000)
 	public void sendFile() {
 		// String computername = InetAddress.getLocalHost().getHostName();
 		// System.out.println(computername);
 		// FileInformationS3 fileinfo = filerepo.findTop1ByFileStatus(false);
+
 		BufferedWriter bw = null;
+
 		try {
 			Map<String, Object> mapObject = downloadFileFromS3();
 			/* if (fileinfo != null && fileinfo.getFileStatus() == false) { */
@@ -90,7 +96,8 @@ public class ConnectorHttp {
 				/* File file = new File(url); */
 				File file = new File(PropertyConstants.s3DocCopyLocation + filename);
 				String BASE_URL = "http://localhost:8080/questions";
-				BASE_URL = baseUrl;
+				/* BASE_URL = baseUrl */;
+				BASE_URL=properties.getProperty(PropertyConstants.BASEURL);
 				HttpClient client = HttpClientBuilder.create().build();
 
 				HttpPost postRequest = new HttpPost(BASE_URL);
@@ -171,9 +178,13 @@ public class ConnectorHttp {
 		Map<String, Object> map = new HashMap<String, Object>();
 		if (properties == null) {
 			loadPropertyObj();
+		} else if (properties.isEmpty()) {
+			loadPropertyObj();
 		}
 		FileInformationS3 fileinfo = null;
-		if (properties.getProperty("cronNum") != null && StringUtils.isNumeric(properties.getProperty("cronNum"))) {
+
+		if (properties != null && properties.getProperty("cronNum") != null
+				&& StringUtils.isNumeric(properties.getProperty("cronNum"))) {
 
 			fileinfo = filerepo.findTop1ByFileStatusAndAssignedCron(false,
 					Integer.parseInt(properties.getProperty("cronNum")));
@@ -266,18 +277,48 @@ public class ConnectorHttp {
 
 	public static void loadPropertyObj() throws PropertyLoadException {
 		try {
-			String computername = InetAddress.getLocalHost().getHostName();
-			String[] domainname = null;
-			String domname = "";
-			if (computername.contains("-")) {
-				domainname = computername.split("-");
+			/*
+			 * String computername = InetAddress.getLocalHost().getHostName();
+			 * String[] domainname = null; String domname = ""; if
+			 * (computername.contains("-")) { domainname =
+			 * computername.split("-"); } if (domainname != null) { domname =
+			 * domainname[0]; } properties = new Properties(); String name =
+			 * "/home/" + domname.trim() +
+			 * PropertyConstants.propertyFileLocation; properties.load(new
+			 * FileInputStream(name));
+			 */
+			String path = "";
+			try {
+				// path =
+				// ClassLoader.getSystemClassLoader().getResource(".").getPath();
+				path = ConnectorHttp.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+				path=path.replace("file:", "");
+				// path = path.substring(0, path.length() - 1);
+				System.out.println(path);
+
+				if (path.contains(".jar")) {
+					int iin = path.indexOf(".jar");
+					path = path.substring(0, iin);
+					int index = path.lastIndexOf('/');
+					path = path.substring(0, index);
+				}
+				System.out.println("**************************************" + path);
+				/* .getCodeSource().getLocation().toURI())).getName() */
+			} catch (Exception e) {
+				// e.printStackTrace();
+				System.out.println("exception occured");
+				e.printStackTrace();
 			}
-			if (domainname != null) {
-				domname = domainname[0];
-			}
+
+			System.out.println(path);
+			int index = path.lastIndexOf('/');
+			path = path.substring(0, index);
+			System.out.println("finalpath"+path);
+			System.out.println(path.trim() + PropertyConstants.propertyFileLocation);
 			properties = new Properties();
-			String name = "/home/" + domname.trim() + PropertyConstants.propertyFileLocation;
-			properties.load(new FileInputStream(name));
+			if (path != null && !path.isEmpty()) {
+				properties.load(new FileInputStream(path.trim() + PropertyConstants.propertyFileLocation));
+			}
 		} catch (FileNotFoundException e) {
 			// e.printStackTrace();
 			throw new PropertyLoadException(e);
@@ -287,14 +328,26 @@ public class ConnectorHttp {
 		} catch (IOException e) {
 			// e.printStackTrace();
 			throw new PropertyLoadException(e);
-		}
-
-	}
-
-	public static void main(String args[]) throws PropertyLoadException {
-		for (int i = 0; i < 17; i++) {
-			uploadToS3("logs/Responselogs.txt", "filename");
+		} catch (NullPointerException e) {
+			// e.printStackTrace();
+			throw new PropertyLoadException(e);
 		}
 	}
+
+	/*
+	 * public static void main(String args[]) throws PropertyLoadException {
+	 * 
+	 * String basePath = new File("").getAbsolutePath();
+	 * System.out.println(basePath); String
+	 * path=ClassLoader.getSystemClassLoader().getResource(".").getPath();
+	 * path=path.substring(0,path.length()-1); System.out.println(path); int
+	 * index=path.lastIndexOf('/'); path=path.substring(0, index);
+	 * System.out.println(path);
+	 * 
+	 * for (int i = 0; i < 17; i++) { uploadToS3("logs/Responselogs.txt",
+	 * "filename");
+	 * 
+	 * } }
+	 */
 
 }
