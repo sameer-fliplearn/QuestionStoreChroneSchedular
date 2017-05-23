@@ -97,7 +97,7 @@ public class ConnectorHttp {
 				File file = new File(PropertyConstants.s3DocCopyLocation + filename);
 				String BASE_URL = "http://localhost:8080/questions";
 				/* BASE_URL = baseUrl */;
-				BASE_URL=properties.getProperty(PropertyConstants.BASEURL);
+				BASE_URL = properties.getProperty(PropertyConstants.BASEURL);
 				HttpClient client = HttpClientBuilder.create().build();
 
 				HttpPost postRequest = new HttpPost(BASE_URL);
@@ -292,15 +292,13 @@ public class ConnectorHttp {
 				// path =
 				// ClassLoader.getSystemClassLoader().getResource(".").getPath();
 				path = ConnectorHttp.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-				path=path.replace("file:", "");
+				path = path.replace("file:", "");
 				// path = path.substring(0, path.length() - 1);
 				System.out.println(path);
 
 				if (path.contains(".jar")) {
-					int iin = path.indexOf(".jar");
-					path = path.substring(0, iin);
-					int index = path.lastIndexOf('/');
-					path = path.substring(0, index);
+					path = path.substring(0, path.indexOf(".jar"));
+					path = path.substring(0, path.lastIndexOf('/'));
 				}
 				System.out.println("**************************************" + path);
 				/* .getCodeSource().getLocation().toURI())).getName() */
@@ -311,9 +309,9 @@ public class ConnectorHttp {
 			}
 
 			System.out.println(path);
-			int index = path.lastIndexOf('/');
-			path = path.substring(0, index);
-			System.out.println("finalpath"+path);
+			path = path.substring(0, path.length() - 1);
+			path = path.substring(0, path.lastIndexOf('/'));
+			System.out.println("finalpath" + path);
 			System.out.println(path.trim() + PropertyConstants.propertyFileLocation);
 			properties = new Properties();
 			if (path != null && !path.isEmpty()) {
