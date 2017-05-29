@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -217,7 +218,13 @@ public class ConnectorHttp {
 			fileName = "sentFromCron" + new SimpleDateFormat(properties.getProperty("dateFormat")).format(new Date())
 					+ "" + fileinfo.getFileName();
 			map.put("filename", fileName);
-			File inputFile = new File(PropertyConstants.s3DocCopyLocation + fileName);
+			String computername = InetAddress.getLocalHost().getHostName();
+			  String[] domainname = null; String domname = ""; if
+			 (computername.contains("-")) { domainname =
+			 computername.split("-"); } if (domainname != null) { domname =
+			 domainname[0]; } 
+			 String fileLocation ="/home/" + domname.trim()+PropertyConstants.s3DocCopyLocation ;
+			File inputFile = new File(fileLocation + fileName);
 			GetObjectRequest getObjectRequest = new GetObjectRequest(
 					properties.getProperty(PropertyConstants.bucketName),
 					properties.getProperty("s3DocLocation") + fileinfo.getFileName().trim());

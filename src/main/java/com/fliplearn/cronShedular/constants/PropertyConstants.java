@@ -17,7 +17,7 @@ public static final String chapterid = "chapterid";
 public static final String topicid = "topicid";
 //s3
 public static final String bucketName="bucketName";
-public static final String s3DocCopyLocation="/home/sameer/Downloads/s3DownloadedFiles/";
+public static final String s3DocCopyLocation="/Downloads/s3DownloadedFiles/";
 //local
 public static final String extensionDocx =".docx";
 public static final String extensionDoc =".doc";
