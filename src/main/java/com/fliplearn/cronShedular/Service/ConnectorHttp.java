@@ -292,13 +292,14 @@ public class ConnectorHttp {
 				// path =
 				// ClassLoader.getSystemClassLoader().getResource(".").getPath();
 				path = ConnectorHttp.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+				//path = ConnectorHttp.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
 				path = path.replace("file:", "");
-				// path = path.substring(0, path.length() - 1);
+			   //path = path.substring(0, path.length() - 1);
 				System.out.println(path);
 
 				if (path.contains(".jar")) {
 					path = path.substring(0, path.indexOf(".jar"));
-					path = path.substring(0, path.lastIndexOf('/'));
+					//path = path.substring(0, path.lastIndexOf('/'));
 				}
 				System.out.println("**************************************" + path);
 				/* .getCodeSource().getLocation().toURI())).getName() */
