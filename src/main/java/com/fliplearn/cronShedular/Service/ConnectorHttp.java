@@ -95,7 +95,10 @@ public class ConnectorHttp {
 				logger.info("inside sendFlie() count: " + count);
 
 				/* File file = new File(url); */
-				File file = new File(PropertyConstants.s3DocCopyLocation + filename);
+				String domname=getHostName();
+				 String fileLocation ="/home/" + domname.trim()+PropertyConstants.s3DocCopyLocation ;
+			
+				File file = new File(fileLocation+ filename);
 				String BASE_URL = "http://localhost:8080/questions";
 				/* BASE_URL = baseUrl */;
 				BASE_URL = properties.getProperty(PropertyConstants.BASEURL);
@@ -139,7 +142,7 @@ public class ConnectorHttp {
 							 * writer.write("Hello World !!"); }
 							 */
 							uploadToS3("logs/Responselogs.txt", filename);
-							filerepo.updateFileStatus(true, fileinfo.getId());
+							filerepo.updateCronStatus(true, fileinfo.getId());
 							logger.info(myObject.toString());
 						} else {
 							bw.write(response.toString());
@@ -218,11 +221,12 @@ public class ConnectorHttp {
 			fileName = "sentFromCron" + new SimpleDateFormat(properties.getProperty("dateFormat")).format(new Date())
 					+ "" + fileinfo.getFileName();
 			map.put("filename", fileName);
-			String computername = InetAddress.getLocalHost().getHostName();
+			/*String computername = InetAddress.getLocalHost().getHostName();
 			  String[] domainname = null; String domname = ""; if
 			 (computername.contains("-")) { domainname =
 			 computername.split("-"); } if (domainname != null) { domname =
-			 domainname[0]; } 
+			 domainname[0]; } */
+			String domname=getHostName();
 			 String fileLocation ="/home/" + domname.trim()+PropertyConstants.s3DocCopyLocation ;
 			File inputFile = new File(fileLocation + fileName);
 			GetObjectRequest getObjectRequest = new GetObjectRequest(
@@ -340,6 +344,19 @@ public class ConnectorHttp {
 		}
 	}
 
+	public String getHostName() throws UnknownHostException {
+		String computername = InetAddress.getLocalHost().getHostName();
+		String[] domainname = null;
+		String domname = "";
+		if (computername.contains("-")) {
+			domainname = computername.split("-");
+		}
+		if (domainname != null) {
+			domname = domainname[0];
+		}
+		return domname;
+	}
+	
 	/*
 	 * public static void main(String args[]) throws PropertyLoadException {
 	 * 
