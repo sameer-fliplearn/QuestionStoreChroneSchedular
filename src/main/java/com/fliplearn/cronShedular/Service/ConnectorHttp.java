@@ -221,7 +221,7 @@ public class ConnectorHttp {
 			 * bucketName),"questionbank/"+"HtmlResponse"+"/",emptyContent,
 			 * metadata); s3client.putObject(putObjectRequest);
 			 */
-			fileName = "sentFromCron" + new SimpleDateFormat(properties.getProperty("dateFormat")).format(new Date())
+			fileName = /*"sentFromCron" +*/ new SimpleDateFormat(properties.getProperty("dateFormat")).format(new Date())
 					+ "" + fileinfo.getFileName();
 			map.put("filename", fileName);
 			/*
