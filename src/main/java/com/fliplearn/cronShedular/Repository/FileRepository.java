@@ -18,4 +18,9 @@ public FileInformationS3 findTop1ByCronStatusAndAssignedCron(@Param("cronStatus"
 @Modifying
 @Query("update FileInformationS3 fe set fe.cronStatus=:cronStatus WHERE fe.id =:id")
 int updateCronStatus(@Param("cronStatus")Boolean cronStatus,@Param("id")Integer id);
+
+@Transactional
+@Modifying
+@Query("update FileInformationS3 fe set fe.responseUrl=:responseUrl WHERE fe.id =:id")
+int updateResponseUrl(@Param("responseUrl")String responseUrl,@Param("id")Integer id);
 }
