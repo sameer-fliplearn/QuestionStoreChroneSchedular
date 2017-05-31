@@ -95,10 +95,10 @@ public class ConnectorHttp {
 				logger.info("inside sendFlie() count: " + count);
 
 				/* File file = new File(url); */
-				String domname=getHostName();
-				 String fileLocation ="/home/" + domname.trim()+PropertyConstants.s3DocCopyLocation ;
-			
-				File file = new File(fileLocation+ filename);
+				String domname = getHostName();
+				String fileLocation = "/home/" + domname.trim() + PropertyConstants.s3DocCopyLocation;
+
+				File file = new File(fileLocation + filename);
 				String BASE_URL = "http://localhost:8080/questions";
 				/* BASE_URL = baseUrl */;
 				BASE_URL = properties.getProperty(PropertyConstants.BASEURL);
@@ -120,7 +120,7 @@ public class ConnectorHttp {
 					ObjectMapper objectMapper = new ObjectMapper();
 
 					HttpResponse response = client.execute(postRequest);
-
+					String reponseurl = "";
 					if (response != null) {
 						HttpEntity entityhttp = response.getEntity();
 						if (response.getStatusLine().getStatusCode() == 200) {
@@ -141,18 +141,21 @@ public class ConnectorHttp {
 							 * Files.newBufferedWriter(path)) {
 							 * writer.write("Hello World !!"); }
 							 */
-							uploadToS3("logs/Responselogs.txt", filename);
+							reponseurl = uploadToS3("logs/Responselogs.txt", filename);
 							filerepo.updateCronStatus(true, fileinfo.getId());
+							filerepo.updateResponseUrl(reponseurl, fileinfo.getId());
 							logger.info(myObject.toString());
 						} else {
 							bw.write(response.toString());
 							bw.newLine();
 							bw.flush();
-							uploadToS3("logs/Responselogs.txt", filename);
+							reponseurl = uploadToS3("logs/Responselogs.txt", filename);
+							filerepo.updateResponseUrl(reponseurl, fileinfo.getId());
 							logger.info(response.toString());
 						}
 					} else {
 						logger.error("http response null");
+
 					}
 					// System.out.println(jsonString););
 				} catch (Exception ex) {
@@ -190,7 +193,7 @@ public class ConnectorHttp {
 		if (properties != null && properties.getProperty("cronNum") != null
 				&& StringUtils.isNumeric(properties.getProperty("cronNum"))) {
 
-			fileinfo = filerepo.findTop1ByFileStatusAndAssignedCron(false,
+			fileinfo = filerepo.findTop1ByCronStatusAndAssignedCron(false,
 					Integer.parseInt(properties.getProperty("cronNum")));
 		}
 		String fileName = "";
@@ -221,26 +224,42 @@ public class ConnectorHttp {
 			fileName = "sentFromCron" + new SimpleDateFormat(properties.getProperty("dateFormat")).format(new Date())
 					+ "" + fileinfo.getFileName();
 			map.put("filename", fileName);
-			/*String computername = InetAddress.getLocalHost().getHostName();
-			  String[] domainname = null; String domname = ""; if
-			 (computername.contains("-")) { domainname =
-			 computername.split("-"); } if (domainname != null) { domname =
-			 domainname[0]; } */
-			String domname=getHostName();
-			 String fileLocation ="/home/" + domname.trim()+PropertyConstants.s3DocCopyLocation ;
+			/*
+			 * String computername = InetAddress.getLocalHost().getHostName();
+			 * String[] domainname = null; String domname = ""; if
+			 * (computername.contains("-")) { domainname =
+			 * computername.split("-"); } if (domainname != null) { domname =
+			 * domainname[0]; }
+			 */
+			String bucketName = "";
+			String url = "";
+			if (fileinfo.getFileUrl() != null) {
+
+				String[] urlarry = fileinfo.getFileUrl().split("/", 2);
+				bucketName = urlarry[0];
+				url = urlarry[1];
+			}
+			String domname = getHostName();
+			String fileLocation = "/home/" + domname.trim() + PropertyConstants.s3DocCopyLocation;
 			File inputFile = new File(fileLocation + fileName);
-			GetObjectRequest getObjectRequest = new GetObjectRequest(
-					properties.getProperty(PropertyConstants.bucketName),
-					properties.getProperty("s3DocLocation") + fileinfo.getFileName().trim());
-			s3client.getObject(getObjectRequest, inputFile);
+			if (url != null && !url.isEmpty() && bucketName != null && !bucketName.isEmpty()) {
+				GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, url);
+				s3client.getObject(getObjectRequest, inputFile);
+			} else {
+				GetObjectRequest getObjectRequest = new GetObjectRequest(
+						properties.getProperty(PropertyConstants.bucketName),
+						properties.getProperty("s3DocLocation") + fileinfo.getFileName().trim());
+				s3client.getObject(getObjectRequest, inputFile);
+			}
 		}
 		return map;
 	}
 
-	public static void uploadToS3(String filepath, String fileName) throws PropertyLoadException {
+	public static String uploadToS3(String filepath, String fileName) throws PropertyLoadException {
 		if (properties == null) {
 			loadPropertyObj();
 		}
+		String reponsefileUrl = "";
 		try {
 
 			File tempFile = new File(filepath);
@@ -255,10 +274,9 @@ public class ConnectorHttp {
 			s3client = new AmazonS3Client(credentials);
 			// String bucketName
 			// =properties.getProperty(QuestionBankConstants.bucketName);
-
+			reponsefileUrl = properties.getProperty("responseLocation") + fileName + tempFile.getName();
 			PutObjectRequest putObjectRequest = new PutObjectRequest(
-					properties.getProperty(PropertyConstants.bucketName),
-					properties.getProperty("responseLocation") + fileName + tempFile.getName(), tempFile);
+					properties.getProperty(PropertyConstants.bucketName), reponsefileUrl, tempFile);
 			PutObjectResult result = s3client.putObject(putObjectRequest);
 			System.out.println(result.getVersionId());
 			// create folder code
@@ -284,6 +302,8 @@ public class ConnectorHttp {
 
 		}
 		countretry = 0;
+
+		return properties.getProperty(PropertyConstants.bucketName) + "/" + reponsefileUrl;
 	}
 
 	public static void loadPropertyObj() throws PropertyLoadException {
@@ -303,14 +323,15 @@ public class ConnectorHttp {
 				// path =
 				// ClassLoader.getSystemClassLoader().getResource(".").getPath();
 				path = ConnectorHttp.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-				//path = ConnectorHttp.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+				// path =
+				// ConnectorHttp.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
 				path = path.replace("file:", "");
-			   //path = path.substring(0, path.length() - 1);
+				// path = path.substring(0, path.length() - 1);
 				System.out.println(path);
 
 				if (path.contains(".jar")) {
 					path = path.substring(0, path.indexOf(".jar"));
-					//path = path.substring(0, path.lastIndexOf('/'));
+					// path = path.substring(0, path.lastIndexOf('/'));
 				}
 				System.out.println("**************************************" + path);
 				/* .getCodeSource().getLocation().toURI())).getName() */
@@ -356,7 +377,7 @@ public class ConnectorHttp {
 		}
 		return domname;
 	}
-	
+
 	/*
 	 * public static void main(String args[]) throws PropertyLoadException {
 	 * 
