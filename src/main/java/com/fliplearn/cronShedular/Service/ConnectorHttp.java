@@ -190,7 +190,7 @@ public class ConnectorHttp {
 		if (properties != null && properties.getProperty("cronNum") != null
 				&& StringUtils.isNumeric(properties.getProperty("cronNum"))) {
 
-			fileinfo = filerepo.findTop1ByFileStatusAndAssignedCron(false,
+			fileinfo = filerepo.findTop1ByCronStatusAndAssignedCron(false,
 					Integer.parseInt(properties.getProperty("cronNum")));
 		}
 		String fileName = "";
