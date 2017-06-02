@@ -221,8 +221,9 @@ public class ConnectorHttp {
 			 * bucketName),"questionbank/"+"HtmlResponse"+"/",emptyContent,
 			 * metadata); s3client.putObject(putObjectRequest);
 			 */
-			fileName = /*"sentFromCron" +*/ new SimpleDateFormat(properties.getProperty("dateFormat")).format(new Date())
-					+ "" + fileinfo.getFileName();
+			/*fileName = "sentFromCron" + new SimpleDateFormat(properties.getProperty("dateFormat")).format(new Date())
+					+ "" + fileinfo.getFileName();*/
+			fileName=fileinfo.getFileName();
 			map.put("filename", fileName);
 			/*
 			 * String computername = InetAddress.getLocalHost().getHostName();
@@ -233,13 +234,13 @@ public class ConnectorHttp {
 			 */
 			String bucketName = "";
 			String url = "";
-			if (fileinfo.getFileUrl() != null) {
+			/*if (fileinfo.getFileUrl() != null) {
 
 				String[] urlarry = fileinfo.getFileUrl().split("/", 2);
 				bucketName = urlarry[0];
 				url = urlarry[1];
 			}
-			String domname = getHostName();
+			*/String domname = getHostName();
 			String fileLocation = "/home/" + domname.trim() + PropertyConstants.s3DocCopyLocation;
 			File inputFile = new File(fileLocation + fileName);
 			if (url != null && !url.isEmpty() && bucketName != null && !bucketName.isEmpty()) {
@@ -303,7 +304,7 @@ public class ConnectorHttp {
 		}
 		countretry = 0;
 
-		return properties.getProperty(PropertyConstants.bucketName) + "/" + reponsefileUrl;
+		return properties.getProperty("s3Url") + reponsefileUrl;
 	}
 
 	public static void loadPropertyObj() throws PropertyLoadException {
